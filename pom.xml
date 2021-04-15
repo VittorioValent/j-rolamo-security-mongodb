@@ -30,6 +30,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>it.jrolamo</groupId>
             <artifactId>j-rolamo-generics-mongodb</artifactId>
             <version>0.0.1-SNAPSHOT</version>
@@ -76,6 +81,18 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${io.springfox.version}</version>
+        </dependency>
+
+        <!-- Spring mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        
+        <!-- Mail template -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
         </dependency>
 
     </dependencies>

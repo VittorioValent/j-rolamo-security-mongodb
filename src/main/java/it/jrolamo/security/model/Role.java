@@ -9,12 +9,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @Document(collection = "role")
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class Role extends AbstractModel {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    @EqualsAndHashCode.Include
     private String id;
 
     private String authority;

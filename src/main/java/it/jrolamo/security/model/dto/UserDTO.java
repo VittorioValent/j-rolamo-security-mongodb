@@ -2,6 +2,8 @@ package it.jrolamo.security.model.dto;
 
 import java.util.Collection;
 
+import javax.validation.constraints.Email;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 import it.jrolamo.generics.mongodb.domain.AuditDTO;
@@ -19,6 +21,9 @@ public class UserDTO extends AuditDTO implements UserDetails {
     private String username;
 
     private String password;
+    
+    @Email
+    private String email;
 
     private boolean accountNonExpired;
 

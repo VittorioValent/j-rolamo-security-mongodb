@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import it.jrolamo.security.core.JWTUtils;
-import it.jrolamo.security.core.LoginRequest;
+import it.jrolamo.security.model.dto.ChangePasswordRequest;
+import it.jrolamo.security.model.dto.LoginRequest;
+import it.jrolamo.security.model.dto.RegisterRequest;
 import it.jrolamo.security.model.dto.UserDTO;
 import it.jrolamo.security.service.UserService;
 
@@ -49,19 +51,37 @@ public class AuthenticationController {
         try {
             user = authenticate(loginRequest.getUsername(), loginRequest.getPassword());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getClass().getSimpleName()+" => "+e.getMessage());
         }
         return ResponseEntity.ok(jwtTokenUtil.generateToken(user));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody LoginRequest user) throws Exception {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) throws Exception {
         try {
-            userService.register(user);
+            userService.register(request);
             return ResponseEntity.ok().body(null);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getClass().getSimpleName()+" => "+e.getMessage());
+        }
+    }
+    
+    @PostMapping("/password/reset")
+    public ResponseEntity<?> resetPassword(String username) throws Exception {
+        try {
+            userService.resetPassword(username);
+            return ResponseEntity.ok().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getClass().getSimpleName()+" => "+e.getMessage());
+        }
+    }
+    @PostMapping("/password/change")
+    public ResponseEntity<?> changePassword(ChangePasswordRequest request) throws Exception {
+        try {
+            userService.changePassword(request);
+            return ResponseEntity.ok().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getClass().getSimpleName()+" => "+e.getMessage());
         }
     }
 

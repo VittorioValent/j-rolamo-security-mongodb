@@ -11,17 +11,20 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @Document(collection = "user")
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class User extends AuditModel {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    @EqualsAndHashCode.Include
     private String id;
 
     private String username;
-
+    
     private String password;
+    
+    private String email;
 
     private boolean accountNonExpired;
 
