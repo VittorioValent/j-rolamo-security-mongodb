@@ -28,7 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@PropertySource("classpath:/security/security.properties")
+@PropertySource("classpath:/security/security.yml")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private RequestFilter requestFilter;
 
     @Value("${security.disable}")
-    private boolean disableSecurity = false;
+    private final boolean disableSecurity = false;
 
     /**
      * Configurazione dell'AuthenticationManagerBuilder. L'oggetto auth viene

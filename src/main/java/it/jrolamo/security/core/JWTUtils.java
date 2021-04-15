@@ -1,29 +1,27 @@
 package it.jrolamo.security.core;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import it.jrolamo.security.UserDTO;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import it.jrolamo.security.UserDTO;
-
 /**
  * Util class for JWT handling and generation.
- * 
+ *
  * @author JRolamo
  *
  * @since 1.0
  */
 @Component
-@PropertySource("classpath:/security/security.properties")
+@PropertySource("classpath:/security/security.yml")
 public class JWTUtils implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
