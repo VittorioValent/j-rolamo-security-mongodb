@@ -1,4 +1,4 @@
-package it.jrolamo.security;
+package it.jrolamo.security.controller;
 
 import javax.validation.Valid;
 
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import it.jrolamo.security.core.JWTUtils;
 import it.jrolamo.security.core.LoginRequest;
-import it.jrolamo.security.UserDTO;
+import it.jrolamo.security.model.dto.UserDTO;
 import it.jrolamo.security.service.UserService;
 
 /**

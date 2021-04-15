@@ -1,4 +1,4 @@
-package it.jrolamo.security;
+package it.jrolamo.security.model.dto;
 
 import org.springframework.security.core.GrantedAuthority;
 

@@ -1,4 +1,4 @@
-package it.jrolamo.security;
+package it.jrolamo.security.controller;
 
 import com.querydsl.core.types.Predicate;
 
@@ -15,8 +15,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import it.jrolamo.generics.mongodb.controller.PublicCrudController;
 import it.jrolamo.generics.mongodb.domain.GroupCount;
-import it.jrolamo.security.User;
-import it.jrolamo.security.UserDTO;
+import it.jrolamo.security.model.User;
+import it.jrolamo.security.model.dto.UserDTO;
 import it.jrolamo.security.repository.UserRepository;
 
 /**

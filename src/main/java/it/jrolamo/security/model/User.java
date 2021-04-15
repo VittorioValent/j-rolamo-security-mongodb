@@ -1,4 +1,4 @@
-package it.jrolamo.security;
+package it.jrolamo.security.model;
 
 import java.util.Collection;
 
@@ -13,6 +13,8 @@ import lombok.EqualsAndHashCode;
 @Document(collection = "user")
 @EqualsAndHashCode(callSuper = false)
 public class User extends AuditModel {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String id;

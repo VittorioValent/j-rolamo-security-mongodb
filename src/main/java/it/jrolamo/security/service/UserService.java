@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import it.jrolamo.generics.mongodb.service.ProtectedService;
 import it.jrolamo.security.core.LoginRequest;
-import it.jrolamo.security.Role;
-import it.jrolamo.security.User;
-import it.jrolamo.security.UserDTO;
+import it.jrolamo.security.model.Role;
+import it.jrolamo.security.model.User;
+import it.jrolamo.security.model.dto.UserDTO;
 import it.jrolamo.security.repository.UserRepository;
 
 @Service

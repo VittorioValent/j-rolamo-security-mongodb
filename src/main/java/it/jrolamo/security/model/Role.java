@@ -1,4 +1,4 @@
-package it.jrolamo.security;
+package it.jrolamo.security.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +11,8 @@ import lombok.EqualsAndHashCode;
 @Document(collection = "role")
 @EqualsAndHashCode(callSuper = false)
 public class Role extends AbstractModel {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String id;

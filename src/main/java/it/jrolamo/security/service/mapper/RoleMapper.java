@@ -1,10 +1,10 @@
-package it.jrolamo.security;
+package it.jrolamo.security.service.mapper;
 
 import org.mapstruct.Mapper;
 
 import it.jrolamo.generics.mongodb.mapper.IMapper;
-import it.jrolamo.security.Role;
-import it.jrolamo.security.RoleDTO;
+import it.jrolamo.security.model.Role;
+import it.jrolamo.security.model.dto.RoleDTO;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper extends IMapper<Role, RoleDTO> {

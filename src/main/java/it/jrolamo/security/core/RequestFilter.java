@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import it.jrolamo.security.UserDTO;
+import it.jrolamo.security.model.dto.UserDTO;
 import it.jrolamo.security.service.UserService;
 
 /**
