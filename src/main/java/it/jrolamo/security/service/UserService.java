@@ -23,9 +23,11 @@ import it.jrolamo.generics.mongodb.service.ProtectedService;
 import it.jrolamo.security.mail.MailUtils;
 import it.jrolamo.security.model.Role;
 import it.jrolamo.security.model.User;
-import it.jrolamo.security.model.dto.ChangePasswordRequest;
-import it.jrolamo.security.model.dto.RegisterRequest;
 import it.jrolamo.security.model.dto.UserDTO;
+import it.jrolamo.security.model.dto.request.ChangePasswordRequest;
+import it.jrolamo.security.model.dto.request.RegisterRequest;
+import it.jrolamo.security.model.dto.request.ResetPasswordRequest;
+import it.jrolamo.security.model.dto.request.RetrieveUsernameRequest;
 import it.jrolamo.security.repository.UserRepository;
 
 @Service
@@ -33,19 +35,19 @@ public class UserService extends ProtectedService<User, UserDTO> implements User
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @Autowired
     private MailUtils mailUtils;
 
     @Override
     public UserDTO loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username.trim());
         if (user == null) {
             throw new UsernameNotFoundException("Username not found");
         } else {
@@ -53,14 +55,20 @@ public class UserService extends ProtectedService<User, UserDTO> implements User
         }
     }
 
+    // TODO: trovare un metodo intelligente per fare l'auto trim delle stringhe
+    // nelle request
+
     /**
      * TODO LoginRequest -> RegistrationRequest (con mail e cacate varie)
      * 
      * TODO Impostare i ruoli e tutti gli altri parametri presenti in UserDetails
      * 
      * @param request
+     * @throws TemplateException
+     * @throws IOException
+     * @throws MessagingException
      */
-    public void register(RegisterRequest request) {
+    public void register(RegisterRequest request) throws MessagingException, IOException, TemplateException {
         User user = new User();
         user.setUsername(request.getUsername().trim());
         user.setPassword(passwordEncoder.encode(request.getPassword().trim()));
@@ -68,56 +76,97 @@ public class UserService extends ProtectedService<User, UserDTO> implements User
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
-        user.setEnabled(true);
+        user.setEnabled(false);
         Role roleUser = new Role();
         roleUser.setAuthority("ROLE_USER");
         user.setAuthorities(Arrays.asList(roleUser));
         user = repository.save(user);
         user.setOwner(user.getUsername());
-        repository.save(user);
+        user = repository.save(user);
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setFrom(mailUtils.getFrom());
+        mail.setText(
+                "Per completare la registrazione al nosto fantastico portale clicca al seguente link: http://localhost:18019/auth/public/register/confirm/"
+                        + user.getId());
+        mail.setTo(user.getEmail());
+        mail.setSubject("Conferma registrazione");
+        mailUtils.sendSimpleMessage(mail);
     }
 
     /**
      * Generate new random password and send to email
      * 
-     * @param username
+     * @param request
      * @throws UsernameNotFoundException
      * @throws TemplateException
      * @throws IOException
      * @throws MessagingException
      */
-    public void resetPassword(String username) throws UsernameNotFoundException, MessagingException, IOException, TemplateException {
-        if(!StringUtils.isBlank(username)){
-            UserDTO userDTO = loadUserByUsername(username);
-            String newPassowrd = RandomStringUtils.randomAlphanumeric(8)+RandomStringUtils.randomAscii(4);
+    public void resetPassword(ResetPasswordRequest request)
+            throws UsernameNotFoundException, MessagingException, IOException, TemplateException {
+        if (!StringUtils.isBlank(request.getUsername())) {
+            UserDTO userDTO = loadUserByUsername(request.getUsername().trim());
+            String newPassowrd = RandomStringUtils.randomAlphanumeric(8) + RandomStringUtils.randomAscii(4);
             userDTO.setPassword(passwordEncoder.encode(newPassowrd));
             SimpleMailMessage mail = new SimpleMailMessage();
-            mail.setFrom("copie@targetsolutions.it");
-            mail.setText("Nuova password: "+newPassowrd+"\nRicordati di cambiarla per la miseria!!!");
+            mail.setFrom(mailUtils.getFrom());
+            mail.setText("Nuova password: " + newPassowrd + "\nRicordati di cambiarla per la miseria!!!");
             mail.setTo(userDTO.getEmail());
             mail.setSubject("Recupero Password Fake");
-            mailUtils.sendSimpleMessage(mail); 
+            mailUtils.sendSimpleMessage(mail);
             super.update(userDTO);
-        }else{
+        } else {
             throw new UsernameNotFoundException("Username vuota, nun ce provà...");
         }
     }
 
-    public void changePassword(ChangePasswordRequest request) throws AuthenticationException, BadCredentialsException, MessagingException, IOException, TemplateException, UsernameNotFoundException {
-        if(!request.getOldPassword().trim().equals(request.getNewPassword().trim())){
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
+    public void changePassword(ChangePasswordRequest request) throws AuthenticationException, BadCredentialsException,
+            MessagingException, IOException, TemplateException, UsernameNotFoundException {
+        if (!request.getOldPassword().trim().equals(request.getNewPassword().trim())) {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword()));
             UserDTO userDTO = loadUserByUsername(request.getUsername());
             userDTO.setPassword(passwordEncoder.encode(request.getNewPassword()));
-            
+
             SimpleMailMessage mail = new SimpleMailMessage();
-            mail.setFrom("copie@targetsolutions.it");
-            mail.setText("La tua password è stata modificata\nSe non sei stato tu...Preoccupati perché...STANNO ARRIVANDO!!!");
+            mail.setFrom(mailUtils.getFrom());
+            mail.setText(
+                    "La tua password è stata modificata\nSe non sei stato tu...Preoccupati perché...STANNO ARRIVANDO!!!");
             mail.setTo(userDTO.getEmail());
             mail.setSubject("Modifica Password Fake");
-            mailUtils.sendSimpleMessage(mail); 
+            mailUtils.sendSimpleMessage(mail);
             super.update(userDTO);
-        }else{
+        } else {
             throw new BadCredentialsException("Sei furbo solo te...");
+        }
+    }
+
+    public void retrieveUsername(RetrieveUsernameRequest request)
+            throws UsernameNotFoundException, MessagingException, IOException, TemplateException {
+        if (!StringUtils.isBlank(request.getEmail())) {
+            User user = userRepository.findByEmail(request.getEmail().trim());
+            if (user == null)
+                throw new UsernameNotFoundException("Email non presente nei nostri fantastici archivi");
+            SimpleMailMessage mail = new SimpleMailMessage();
+            mail.setFrom(mailUtils.getFrom());
+            mail.setText("La tua username è sempre stata: " + user.getUsername()
+                    + "\nSegnatela su un foglio vicino al monitor in bella vista...");
+            mail.setTo(user.getEmail());
+            mail.setSubject("Recupero Username Fake");
+            mailUtils.sendSimpleMessage(mail);
+        } else {
+            throw new UsernameNotFoundException("Email vuota, nun ce provà...");
+        }
+    }
+
+    public void confirmRegister(String uuid) throws Exception {
+        UserDTO userDTO = super.read(uuid);
+        if (userDTO != null) {
+            userDTO.setEnabled(true);
+            super.update(userDTO);
+        } else {
+            throw new Exception("Uuid not found or fake");
         }
     }
 }

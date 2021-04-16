@@ -9,5 +9,7 @@ import it.jrolamo.security.model.User;
 public interface UserRepository extends IRepository<User> {
 
     public User findByUsername(String username);
+    
+    public User findByEmail(String email);
 
 }

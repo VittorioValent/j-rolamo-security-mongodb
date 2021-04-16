@@ -9,6 +9,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,11 +19,26 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
+import lombok.Data;
 
 @Component
+@PropertySource("classpath:/security/security.yml")
+@Data
 public class MailUtils {
-    
-    private final String templatePath = "/templates";
+
+    @Value("${security.mail.from}")
+    private String from;
+
+    @Value("${security.mail.templatePath}")
+    private String templatePath;
+
+    // TODO: confuigurazione dei campi per customizzare testi e oggetti delle varie
+    // mail nei vari flussi
+
+    // @Value("${security.mail.registerText}")
+    // private String registerText;
+    // @Value("${security.mail.registerSubject}")
+    // private String registerSubject;
 
     @Autowired
     public JavaMailSender emailSender;
@@ -31,30 +48,31 @@ public class MailUtils {
 
     public void sendSimpleMessage(SimpleMailMessage mail) throws MessagingException, IOException, TemplateException {
         MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message,
-            MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-            StandardCharsets.UTF_8.name());
-            String html = mail.getText();
+        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name());
+        String html = mail.getText();
 
-        if(mail instanceof MailMessage){
+        if (mail instanceof MailMessage) {
             MailMessage mailMessage = (MailMessage) mail;
 
-            if(mailMessage.getTemplate() != null){
-                html = FreeMarkerTemplateUtils.processTemplateIntoString(mailMessage.getTemplate(), mailMessage.getModel());
-            }else{
+            if (mailMessage.getTemplate() != null) {
+                html = FreeMarkerTemplateUtils.processTemplateIntoString(mailMessage.getTemplate(),
+                        mailMessage.getModel());
+            } else {
                 freemarkerConfig.setClassForTemplateLoading(this.getClass(), templatePath);
-                html = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate(mailMessage.getTemplateFilename()), mailMessage.getModel());
+                html = FreeMarkerTemplateUtils.processTemplateIntoString(
+                        freemarkerConfig.getTemplate(mailMessage.getTemplateFilename()), mailMessage.getModel());
             }
             helper.setText(html, true);
 
-            for(Entry<String, File> entry : mailMessage.getAttachments().entrySet()){
+            for (Entry<String, File> entry : mailMessage.getAttachments().entrySet()) {
                 helper.addAttachment(entry.getKey(), entry.getValue());
             }
 
-        }else{
+        } else {
             helper.setText(html);
         }
-        
+
         helper.setTo(mail.getTo());
         helper.setSubject(mail.getSubject());
         helper.setFrom(mail.getFrom());

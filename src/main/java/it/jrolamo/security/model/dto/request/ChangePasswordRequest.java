@@ -1,26 +1,18 @@
-package it.jrolamo.security.model.dto;
+package it.jrolamo.security.model.dto.request;
 
 import java.io.Serializable;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import it.jrolamo.security.core.JWTUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * Container and validation Class for username and password
- * 
- * @author JRolamo
- *
- * @see JWTUtils
- * @see JWTResponse
- * @since 1.0
- */
 @Data
 @AllArgsConstructor
-public class LoginRequest implements Serializable {
+@NoArgsConstructor
+public class ChangePasswordRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,5 +22,10 @@ public class LoginRequest implements Serializable {
 
     @NotNull(message = "{password.notnull}")
     @NotEmpty(message = "{password.notnull}")
-    private String password;
+    private String oldPassword;
+
+    @NotNull(message = "{password.notnull}")
+    @NotEmpty(message = "{password.notnull}")
+    private String newPassword;
+
 }
