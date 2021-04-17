@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import it.jrolamo.generics.mongodb.controller.PublicCrudController;
+import it.jrolamo.generics.mongodb.controller.PrivateCrudController;
 import it.jrolamo.generics.mongodb.domain.GroupCount;
 import it.jrolamo.security.model.User;
 import it.jrolamo.security.model.dto.UserDTO;
@@ -25,8 +25,8 @@ import it.jrolamo.security.repository.UserRepository;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/user")
-@Api(value = "TicketManager", tags = "Protected Crud Controller: Operazioni di gestione Utenti")
-public class UserController extends PublicCrudController<UserDTO> {
+@Api(value = "TicketManager", tags = "Private Crud Controller: Operazioni di gestione Utenti")
+public class UserController extends PrivateCrudController<UserDTO> {
 
     @ApiOperation(value = "Ricerca User con paginazione e filtri opzionali", notes = "Restituisce i dati degli user in formato JSON", response = UserDTO.class, produces = "application/json")
     @Override

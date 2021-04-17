@@ -9,6 +9,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import freemarker.template.TemplateException;
-import it.jrolamo.generics.mongodb.service.ProtectedService;
+import it.jrolamo.generics.mongodb.service.PrivateService;
 import it.jrolamo.security.mail.MailUtils;
 import it.jrolamo.security.model.Role;
 import it.jrolamo.security.model.User;
@@ -31,7 +32,7 @@ import it.jrolamo.security.model.dto.request.RetrieveUsernameRequest;
 import it.jrolamo.security.repository.UserRepository;
 
 @Service
-public class UserService extends ProtectedService<User, UserDTO> implements UserDetailsService {
+public class UserService extends PrivateService<User, UserDTO> implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -59,10 +60,6 @@ public class UserService extends ProtectedService<User, UserDTO> implements User
     // nelle request
 
     /**
-     * TODO LoginRequest -> RegistrationRequest (con mail e cacate varie)
-     * 
-     * TODO Impostare i ruoli e tutti gli altri parametri presenti in UserDetails
-     * 
      * @param request
      * @throws TemplateException
      * @throws IOException
@@ -81,6 +78,9 @@ public class UserService extends ProtectedService<User, UserDTO> implements User
         roleUser.setAuthority("ROLE_USER");
         user.setAuthorities(Arrays.asList(roleUser));
         user = repository.save(user);
+        // in order to set correct audit
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), request.getPassword()));
         user.setOwner(user.getUsername());
         user = repository.save(user);
 
@@ -169,4 +169,23 @@ public class UserService extends ProtectedService<User, UserDTO> implements User
             throw new Exception("Uuid not found or fake");
         }
     }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public UserDTO create(UserDTO dto) {
+        return super.create(dto);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public UserDTO update(UserDTO dto) {
+        return super.update(dto);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public UserDTO merge(String id, UserDTO dto) {
+        return super.merge(id, dto);
+    }
+
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import it.jrolamo.generics.mongodb.controller.PublicCrudController;
+import it.jrolamo.generics.mongodb.controller.PrivateCrudController;
 import it.jrolamo.generics.mongodb.domain.GroupCount;
 import it.jrolamo.security.model.Role;
 import it.jrolamo.security.model.dto.RoleDTO;
@@ -26,7 +26,7 @@ import it.jrolamo.security.repository.RoleRepository;
 @CrossOrigin
 @RequestMapping("/api/role")
 @Api(value = "TicketManager", tags = "Protected Crud Controller: Operazioni di gestione Ruoli")
-public class RoleController extends PublicCrudController<RoleDTO> {
+public class RoleController extends PrivateCrudController<RoleDTO> {
 
     @ApiOperation(value = "Ricerca Ruolo con paginazione e filtri opzionali", notes = "Restituisce i dati dei ruoli in formato JSON", response = RoleDTO.class, produces = "application/json")
     @Override
