@@ -1,9 +1,7 @@
 package it.jrolamo.security.config;
 
 import com.google.common.collect.ImmutableList;
-import it.jrolamo.security.core.JWTAuthenticationEntryPoint;
-import it.jrolamo.security.core.RequestFilter;
-import it.jrolamo.security.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +23,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import it.jrolamo.security.core.JWTAuthenticationEntryPoint;
+import it.jrolamo.security.core.RequestFilter;
+import it.jrolamo.security.service.UserService;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -45,9 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Configurazione dell'AuthenticationManagerBuilder. L'oggetto auth viene
-     * valorizzato con UserService (che implementa UserDetailsService e quindi
-     * il metodo loadByUsername(String username)). All'avvio dell'applicazione,
-     * Spring usa il builder per configurare l'oggetto AuthenticationManager.
+     * valorizzato con UserService (che implementa UserDetailsService e quindi il
+     * metodo loadByUsername(String username)). All'avvio dell'applicazione, Spring
+     * usa il builder per configurare l'oggetto AuthenticationManager.
      *
      * @param auth
      * @throws Exception
@@ -58,8 +60,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Bean di Spring Security che si fa onere di verificare la correttezza
-     * delle credenziali al momento del login di un utente.
+     * Bean di Spring Security che si fa onere di verificare la correttezza delle
+     * credenziali al momento del login di un utente.
      */
     @Bean
     @Override
@@ -84,6 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+        // httpSecurity.cors().configurationSource(corsConfigurationSource());
         if (disableSecurity) {
             httpSecurity.csrf().disable().authorizeRequests().anyRequest().permitAll();
         } else {
@@ -100,17 +103,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * All these path segments are auth-free
      */
-    private static final String[] AUTH_WHITELIST = {"/v2/api-docs/**", "/swagger-**", "/h2-console/**",
-        "/api/**/public/**", "/auth/**", "/swagger-resources/**", "/webjars/**", "/workshop/**", "/actuator/**"};
+    private static final String[] AUTH_WHITELIST = { "/v2/api-docs/**", "/swagger-**", "/h2-console/**",
+            "/api/**/public/**", "/auth/**", "/swagger-resources/**", "/webjars/**", "/workshop/**", "/actuator/**" };
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(ImmutableList.of("*"));
+        configuration.setAllowedOriginPatterns(ImmutableList.of("*"));
         configuration.setAllowedMethods(ImmutableList.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type",
                 "Access-Control-Allow-Headers", "Access-Control-Allow-Origin"));
+        // configuration.setExposedHeaders(ImmutableList.of("Authorization",
+        // "Cache-Control", "Content-Type",
+        // "Access-Control-Allow-Headers", "Access-Control-Allow-Origin"));
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
