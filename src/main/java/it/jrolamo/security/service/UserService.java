@@ -73,7 +73,7 @@ public class UserService extends PrivateService<User, UserDTO> implements UserDe
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
-        user.setEnabled(false);
+        user.setEnabled(true);
         Role roleUser = new Role();
         roleUser.setAuthority("ROLE_USER");
         user.setAuthorities(Arrays.asList(roleUser));
@@ -82,6 +82,7 @@ public class UserService extends PrivateService<User, UserDTO> implements UserDe
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), request.getPassword()));
         user.setOwner(user.getUsername());
+        user.setEnabled(false);
         user = repository.save(user);
 
         SimpleMailMessage mail = new SimpleMailMessage();
