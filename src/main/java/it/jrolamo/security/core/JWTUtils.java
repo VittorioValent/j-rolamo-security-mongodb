@@ -8,12 +8,12 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import it.jrolamo.security.model.dto.UserDTO;
 
 /**
  * Util class for JWT handling and generation.
@@ -56,8 +56,10 @@ public class JWTUtils implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateToken(UserDTO user) {
+    public String generateToken(UserDetails user) {
+        // Token contains username, roles, creationDate, expiredDate
         Map<String, Object> claims = new HashMap<>();
+        claims.put("autorities", user.getAuthorities());
         return doGenerateToken(claims, user.getUsername());
     }
 
@@ -66,13 +68,12 @@ public class JWTUtils implements Serializable {
     // 2. Sign the JWT using the HS512 algorithm and secret key.
     // 3. According to JWS Compact
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + validity))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
-    public Boolean validateToken(String token, UserDTO user) {
+    public Boolean validateToken(String token, UserDetails user) {
         final String username = getUsernameFromToken(token);
         return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }

@@ -10,13 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import it.jrolamo.security.model.dto.UserDTO;
-import it.jrolamo.security.service.UserService;
+import it.jrolamo.security.service.IUserService;
 
 /**
  * This class is responsible for filtering every request and return 401 error if
@@ -30,7 +30,7 @@ import it.jrolamo.security.service.UserService;
 public class RequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Autowired
     private JWTUtils jwtUtils;
@@ -50,16 +50,16 @@ public class RequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtils.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
+                throw new ServletException("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
+                throw new ServletException("JWT Token has expired");
             }
         }
 
         // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDTO userDetails = this.userService.loadUserByUsername(username);
+            UserDetails userDetails = this.userService.loadUserByUsername(username);
 
             // if token is valid configure Spring Security to manually set
             // authentication

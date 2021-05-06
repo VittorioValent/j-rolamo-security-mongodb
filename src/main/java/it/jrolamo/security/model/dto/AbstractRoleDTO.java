@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RoleDTO extends AuditDTO implements GrantedAuthority {
+public class AbstractRoleDTO extends AuditDTO implements GrantedAuthority {
 
     private static final long serialVersionUID = 1L;
 

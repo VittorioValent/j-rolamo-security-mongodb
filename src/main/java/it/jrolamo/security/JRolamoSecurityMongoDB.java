@@ -1,9 +1,7 @@
 package it.jrolamo.security;
 
-import it.jrolamo.security.repository.RoleRepository;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  *
@@ -13,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @Configuration
 @ComponentScan(basePackageClasses = JRolamoSecurityMongoDB.class)
-@EnableMongoRepositories(basePackageClasses = RoleRepository.class)
+// @EnableMongoRepositories(basePackageClasses = AbstractRoleRepository.class)
 public class JRolamoSecurityMongoDB {
 
 }

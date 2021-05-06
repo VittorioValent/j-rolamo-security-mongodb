@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import it.jrolamo.security.core.JWTUtils;
-import it.jrolamo.security.model.dto.UserDTO;
+import it.jrolamo.security.model.dto.AbstractUserDTO;
 import it.jrolamo.security.model.dto.request.ChangePasswordRequest;
 import it.jrolamo.security.model.dto.request.LoginRequest;
 import it.jrolamo.security.model.dto.request.RegisterRequest;
 import it.jrolamo.security.model.dto.request.ResetPasswordRequest;
 import it.jrolamo.security.model.dto.request.RetrieveUsernameRequest;
-import it.jrolamo.security.service.UserService;
+import it.jrolamo.security.service.IUserService;
 
 /**
  * Controller that handles authentication and registration. With
@@ -37,7 +35,7 @@ import it.jrolamo.security.service.UserService;
  */
 @RestController
 @RequestMapping("/auth/public")
-@Api(value = "TicketManager", tags = "Protected Crud Controller: Operazioni di gestione Accessi e Registrazione")
+@Api(value = "AuthenticationController", tags = "Protected Crud Controller: Operazioni di gestione Accessi e Registrazione")
 public class AuthenticationController {
 
     @Autowired
@@ -47,11 +45,11 @@ public class AuthenticationController {
     private JWTUtils jwtTokenUtil;
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserDTO user;
+        AbstractUserDTO user;
         try {
             user = authenticate(loginRequest.getUsername(), loginRequest.getPassword());
         } catch (Exception e) {
@@ -108,7 +106,6 @@ public class AuthenticationController {
     @PostMapping("/username/retrieve")
     public ResponseEntity<?> retrieveUsername(@Valid @RequestBody RetrieveUsernameRequest request) throws Exception {
         try {
-
             userService.retrieveUsername(request);
             return ResponseEntity.ok().body(null);
         } catch (Exception e) {
@@ -117,14 +114,8 @@ public class AuthenticationController {
         }
     }
 
-    private UserDTO authenticate(String username, String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            return userService.loadUserByUsername(username);
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
+    private AbstractUserDTO authenticate(String username, String password) throws Exception {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        return (AbstractUserDTO) userService.loadUserByUsername(username);
     }
 }

@@ -2,8 +2,6 @@ package it.jrolamo.security.model.dto;
 
 import java.util.Collection;
 
-import javax.validation.constraints.Email;
-
 import org.springframework.security.core.userdetails.UserDetails;
 
 import it.jrolamo.generics.mongodb.domain.AuditDTO;
@@ -12,7 +10,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class UserDTO extends AuditDTO implements UserDetails {
+public class AbstractUserDTO extends AuditDTO implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +19,7 @@ public class UserDTO extends AuditDTO implements UserDetails {
     private String username;
 
     private String password;
-    
-    @Email
+
     private String email;
 
     private boolean accountNonExpired;
@@ -33,5 +30,5 @@ public class UserDTO extends AuditDTO implements UserDetails {
 
     private boolean credentialsNonExpired;
 
-    private Collection<RoleDTO> authorities;
+    private Collection<AbstractRoleDTO> authorities;
 }

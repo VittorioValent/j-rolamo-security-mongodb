@@ -25,7 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import it.jrolamo.security.core.JWTAuthenticationEntryPoint;
 import it.jrolamo.security.core.RequestFilter;
-import it.jrolamo.security.service.UserService;
+import it.jrolamo.security.service.IUserService;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Autowired
     private RequestFilter requestFilter;
